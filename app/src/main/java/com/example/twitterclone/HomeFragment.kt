@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class HomeFragment : Fragment() {
 
@@ -18,7 +19,7 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
 
         val view=inflater.inflate(R.layout.fragment_home, container, false)
-        val postButton=view.findViewById<MaterialButton>(R.id.postTweet)
+        val postButton=view.findViewById<FloatingActionButton>(R.id.postTweet)
         postButton.setOnClickListener {
             val intent= Intent(activity,TweetPostActivity::class.java)
             startActivity(intent)
