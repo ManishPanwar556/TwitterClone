@@ -7,18 +7,24 @@
     android:padding="8dp"
     android:orientation="vertical"
     tools:context=".TweetPostActivity">
-<androidx.cardview.widget.CardView
+<com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
-    android:layout_height="140dp"
-    android:layout_marginTop="80dp"
-    android:padding="8dp"
+    android:layout_height="160dp"
+    android:id="@+id/tweetTextInput"
+    app:counterEnabled="true"
+    app:counterMaxLength="150"
+    app:errorEnabled="true"
     >
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:hint="Enter Your Tweet Here" />
-</androidx.cardview.widget.CardView>
+        android:layout_height="120dp"
+        android:maxLength="150"
+        android:id="@+id/tweetInputEditText"
+        android:inputType="text|textMultiLine"
+        android:hint="Write Tweet Here..."
+        />
+
+</com.google.android.material.textfield.TextInputLayout>
 
 <com.google.android.material.button.MaterialButton
     android:layout_width="wrap_content"
@@ -27,6 +33,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:text="Post Tweet"
+    android:id="@+id/postTweet"
     app:backgroundTint="@android:color/holo_blue_light"
     android:textAllCaps="false"/>
 </LinearLayout>
