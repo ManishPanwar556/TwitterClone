@@ -1,9 +1,9 @@
-package com.example.twitterclone
+package com.example.twitterclone.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.twitterclone.R
 import com.example.twitterclone.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
                     loadFragment(HomeFragment())
                     true
                 }
-                R.id.search-> {
+                R.id.search -> {
                     loadFragment(SearchFragment())
                     true
                 }

@@ -1,6 +1,6 @@
 package com.example.twitterclone.Dao
 
-import com.example.twitterclone.User
+import com.example.twitterclone.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference

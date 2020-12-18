@@ -3,9 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_marginTop="15dp"
+    android:padding="10dp"
+    android:layout_height="250dp">
 
     <androidx.cardview.widget.CardView
+        app:cardElevation="10dp"
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="140dp"
@@ -17,17 +20,27 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+           <LinearLayout
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content">
+               <de.hdodenhof.circleimageview.CircleImageView
+                   android:id="@+id/tweetProfile"
+                   android:layout_width="40dp"
+                   android:layout_height="40dp"
+                   android:layout_gravity="top|left"
+                   android:src="@drawable/ic_launcher_background" />
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:id="@+id/tweetUserName"
+                   android:layout_marginLeft="10dp"/>
+           </LinearLayout>
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/tweetProfile"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="top|left"
-                android:src="@drawable/ic_launcher_background" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/tweetTextView"
                 android:padding="2dp" />
 
         </LinearLayout>

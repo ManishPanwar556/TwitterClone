@@ -1,4 +1,4 @@
-package com.example.twitterclone
+package com.example.twitterclone.model
 
 data class User(
     var name:String?,

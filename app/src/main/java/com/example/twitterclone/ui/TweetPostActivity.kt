@@ -1,6 +1,5 @@
-package com.example.twitterclone
+package com.example.twitterclone.ui
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -26,25 +25,8 @@ class TweetPostActivity : AppCompatActivity() {
                 }
                 else -> {
                     //                Post the tweet
-                    val result = TweetDao().postTweet(binding.tweetInputEditText.text.toString())
-                    GlobalScope.launch(Dispatchers.Main) {
-                        result.await().addOnSuccessListener {
-                            Toast.makeText(
-                                this@TweetPostActivity,
-                                "Tweet Post Success",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            finish()
-                        }.addOnFailureListener {
-                            Toast.makeText(
-                                this@TweetPostActivity,
-                                "Tweet Post Failed",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            finish()
-                        }
-
-                    }
+                    TweetDao(applicationContext).postTweet(binding.tweetInputEditText.text.toString())
+                    finish()
 
                 }
             }

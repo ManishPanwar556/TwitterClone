@@ -1,10 +1,11 @@
-package com.example.twitterclone
+package com.example.twitterclone.ui
 
 import com.example.twitterclone.Dao.UserDao
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import com.example.twitterclone.R
 import com.example.twitterclone.databinding.ActivitySignInBinding
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn

@@ -1,4 +1,4 @@
-package com.example.twitterclone
+package com.example.twitterclone.ui
 
 import com.example.twitterclone.Dao.UserDao
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.example.twitterclone.R
 
 
 class ProfileFragment : Fragment() {
