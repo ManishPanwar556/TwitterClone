@@ -14,13 +14,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.twitterclone.Dao.TweetDao
 import com.example.twitterclone.R
 import com.example.twitterclone.adapters.MyAdapter
+import com.example.twitterclone.interfaces.ClickInterface
 import com.example.twitterclone.model.Tweet
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.GlobalScope
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(),ClickInterface {
 
 private val tweetDao by lazy {
     TweetDao(requireContext())
@@ -47,11 +48,17 @@ private val tweetDao by lazy {
     }
     private fun updateRecyclerView(list:ArrayList<HashMap<String,Any>>,view: View){
         val rev=view.findViewById<RecyclerView>(R.id.tweetsRecyclerView)
-        rev.adapter=MyAdapter(list)
+        rev.adapter=MyAdapter(list,this)
         rev.layoutManager=LinearLayoutManager(context,RecyclerView.VERTICAL,false)
     }
 
+    override fun clickLike(uid: String) {
 
+    }
+
+    override fun clickDislike(uid: String) {
+
+    }
 
 
 }

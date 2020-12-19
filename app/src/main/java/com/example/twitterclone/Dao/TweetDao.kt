@@ -13,47 +13,68 @@ import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class TweetDao(private val context: Context) {
-    val tweetTag="Tweet"
-    private val db=FirebaseFirestore.getInstance().collection("users")
-    private val uid=FirebaseAuth.getInstance().currentUser?.uid
-    lateinit var result:Task<Void>
-    fun postTweet(tweet:String) {
-        val simpleDateFormat=SimpleDateFormat("MMM,d")
-        val date= Date(System.currentTimeMillis())
-        val createdAt=simpleDateFormat.format(date)
-        val tweetEntity=Tweet(tweet,0,0,createdAt)
+    val tweetTag = "Tweet"
+    private val db = FirebaseFirestore.getInstance().collection("users")
+    private val uid = FirebaseAuth.getInstance().currentUser?.uid
+    lateinit var result: Task<Void>
+    fun postTweet(tweet: String) {
+        val simpleDateFormat = SimpleDateFormat("MMM,d")
+        val date = Date(System.currentTimeMillis())
+        val createdAt = simpleDateFormat.format(date)
+        db.document("$uid").get().addOnSuccessListener {
+            val profileUrl = it.get("profileUrl").toString()
+            val tweetEntity = Tweet(tweet, 0, 0, createdAt, profileUrl,uid)
+            doPost(tweetEntity)
+        }
 
+
+    }
+
+    private fun toast(message: String, toastContext: Context) {
+        Toast.makeText(toastContext, message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun getTweets(): DocumentReference {
+        return db.document("tweets")
+    }
+
+    private fun doPost(tweetEntity: Tweet) {
         db.document("tweets").get().addOnSuccessListener {
 
-            result = if(it.get(uid.toString())==null){
-                val map=mapOf<String,ArrayList<Tweet>>(
+            result = if (it.get(uid.toString()) == null) {
+                val map = mapOf<String, ArrayList<Tweet>>(
                     uid.toString() to arrayListOf(tweetEntity)
                 )
                 db.document("tweets").set(map).addOnSuccessListener {
-                    toast("Success",context)
+                    toast("Success", context)
                 }.addOnFailureListener {
-                    toast("Failure",context)
+                    toast("Failure", context)
                 }
-            } else{
+            } else {
 
-                db.document("tweets").update(uid.toString(),FieldValue.arrayUnion(tweetEntity)).addOnSuccessListener {
-                    toast("Success",context)
-                }.addOnFailureListener {
-                    toast("Failure",context)
+                db.document("tweets").update(uid.toString(), FieldValue.arrayUnion(tweetEntity))
+                    .addOnSuccessListener {
+                        toast("Success", context)
+                    }.addOnFailureListener {
+                    toast("Failure", context)
                 }
             }
         }.addOnFailureListener {
-            toast("Failure",context)
+            toast("Failure", context)
         }
 
     }
-    private fun toast(message:String,toastContext:Context){
-        Toast.makeText(toastContext,message,Toast.LENGTH_SHORT).show()
-
+    fun updateLike(uid:String,position:Int){
+        db.document("tweets").get().addOnSuccessListener {
+            val tweetArray=it.get("$uid") as ArrayList<HashMap<String,Any>>
+            val likes=tweetArray[position].get("likes") as Long
+            postLike(likes,uid,position)
+        }
     }
-    fun getTweets():DocumentReference{
-        return db.document("tweets")
+    private fun postLike(likes:Long,uid:String,position:Int){
+
     }
 }

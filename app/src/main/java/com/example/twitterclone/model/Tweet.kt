@@ -4,5 +4,7 @@ data class Tweet(
     var content: String?,
     var likes: Long?,
     val dislikes: Long?,
-    var createdAt: String?
+    var createdAt: String?,
+    val profileUrl:String?,
+    val uid:String?
 )
