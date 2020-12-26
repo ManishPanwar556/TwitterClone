@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.example.twitterclone.R
+import com.google.firebase.auth.FirebaseAuth
 
 
 class ProfileFragment : Fragment() {
@@ -24,7 +25,7 @@ class ProfileFragment : Fragment() {
         val following = view.findViewById<TextView>(R.id.following)
         val profileImage =
             view.findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.profileImage)
-        UserDao().getUser().addSnapshotListener { value, error ->
+        UserDao(requireContext()).getUser(FirebaseAuth.getInstance().currentUser?.uid.toString()).addSnapshotListener { value, error ->
             followers.text = value?.get("followers").toString()
             following.text = value?.get("following").toString()
             userName.text = value?.get("name").toString()

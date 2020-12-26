@@ -77,7 +77,7 @@ class SignInActivity : AppCompatActivity() {
 
         mauth.signInWithCredential(credential).addOnSuccessListener {
             val firebaseUser = it.user
-            val userDao=UserDao()
+            val userDao=UserDao(applicationContext)
             GlobalScope.launch(Dispatchers.Main) {
                 val res=async {
                     userDao.addUser(firebaseUser)

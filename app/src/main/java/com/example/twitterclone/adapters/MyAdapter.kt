@@ -8,19 +8,22 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.twitterclone.Dao.UserDao
 import com.example.twitterclone.R
 import com.example.twitterclone.interfaces.ClickInterface
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 
-class MyAdapter(private val list:ArrayList<HashMap<String,Any>>,private val clickInterface: ClickInterface):RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+class MyAdapter(private val list:ArrayList<DocumentSnapshot>,private val clickInterface: ClickInterface):RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
     inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view){
         init {
-            view.findViewById<ImageView>(R.id.totalLikes).setOnClickListener {
+            view.findViewById<ImageView>(R.id.thumbsUp).setOnClickListener {
                 if(adapterPosition!=RecyclerView.NO_POSITION){
-                    clickInterface.clickLike(list.get(adapterPosition).get("uid").toString())
+                    clickInterface.clickLike(list[adapterPosition].get("tweetId").toString())
                 }
             }
-            view.findViewById<ImageView>(R.id.totalDisLikes).setOnClickListener {
-                clickInterface.clickDislike(list.get(adapterPosition).get("uid").toString())
+            view.findViewById<ImageView>(R.id.comments).setOnClickListener {
+                clickInterface.clickComment(list[adapterPosition].get("tweetId").toString(),list[adapterPosition].get("uid").toString())
             }
         }
 
@@ -35,11 +38,16 @@ class MyAdapter(private val list:ArrayList<HashMap<String,Any>>,private val clic
     override fun onBindViewHolder(holder: MyViewHolder, position: Int){
         val tweet=holder.view.findViewById<TextView>(R.id.tweet)
         val like=holder.view.findViewById<TextView>(R.id.totalLikes)
-        val dislike=holder.view.findViewById<TextView>(R.id.totalDisLikes)
+        val comments=holder.view.findViewById<TextView>(R.id.totalComments)
+        val name=holder.view.findViewById<TextView>(R.id.tweetUserName)
         val profile=holder.view.findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.userProfile)
         tweet.text=list[position].get("content").toString()
         like.text=list[position].get("likes").toString()
-        dislike.text=list[position].get("dislikes").toString()
+//        dislike.text=list[position].get("dislikes").toString()
+        val id=list[position].get("uid").toString()
+        UserDao().getUser(id).get().addOnSuccessListener {
+            name.text=it.get("name").toString()
+        }
         Glide.with(holder.view).load(list[position].get("profileUrl").toString()).into(profile)
 
     }

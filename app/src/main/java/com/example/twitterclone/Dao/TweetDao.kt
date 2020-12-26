@@ -6,6 +6,7 @@ import android.widget.Toast
 import com.example.twitterclone.model.Tweet
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -18,16 +19,17 @@ import kotlin.collections.HashMap
 class TweetDao(private val context: Context) {
     val tweetTag = "Tweet"
     private val db = FirebaseFirestore.getInstance().collection("users")
+    private val tweetDb=FirebaseFirestore.getInstance().collection("tweets")
     private val uid = FirebaseAuth.getInstance().currentUser?.uid
     lateinit var result: Task<Void>
     fun postTweet(tweet: String) {
-        val simpleDateFormat = SimpleDateFormat("MMM,d")
-        val date = Date(System.currentTimeMillis())
-        val createdAt = simpleDateFormat.format(date)
+
         db.document("$uid").get().addOnSuccessListener {
             val profileUrl = it.get("profileUrl").toString()
-            val tweetEntity = Tweet(tweet, 0, 0, createdAt, profileUrl,uid)
-            doPost(tweetEntity)
+            val totalFollowers=it.get("followers") as Long
+            val totalFollowing=it.get("following") as Long
+            val name=it.get("name").toString()
+            doPost(profileUrl,totalFollowers,totalFollowing,name,tweet)
         }
 
 
@@ -37,44 +39,38 @@ class TweetDao(private val context: Context) {
         Toast.makeText(toastContext, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun getTweets(): DocumentReference {
-        return db.document("tweets")
+    fun getTweets(): CollectionReference {
+        return tweetDb
     }
 
-    private fun doPost(tweetEntity: Tweet) {
-        db.document("tweets").get().addOnSuccessListener {
+    private fun doPost(profileUrl:String,totalFollowers:Long,totalFollowing:Long,name:String,tweet: String) {
+        val id=UUID.randomUUID().toString()
+        val simpleDateFormat = SimpleDateFormat("MMM d")
+        val date = Date(System.currentTimeMillis())
+        val createdAt = simpleDateFormat.format(date)
+        val tweetEntity=Tweet(tweet,0,0,createdAt,profileUrl,uid,id,false)
 
-            result = if (it.get(uid.toString()) == null) {
-                val map = mapOf<String, ArrayList<Tweet>>(
-                    uid.toString() to arrayListOf(tweetEntity)
-                )
-                db.document("tweets").set(map).addOnSuccessListener {
-                    toast("Success", context)
-                }.addOnFailureListener {
-                    toast("Failure", context)
-                }
-            } else {
+       tweetDb.document("$id").set(tweetEntity).addOnSuccessListener {
+           toast("Tweet Post Success",context)
+       }.addOnFailureListener {
+           toast("Tweet Post Failure",context)
+       }
+    }
 
-                db.document("tweets").update(uid.toString(), FieldValue.arrayUnion(tweetEntity))
-                    .addOnSuccessListener {
-                        toast("Success", context)
-                    }.addOnFailureListener {
-                    toast("Failure", context)
-                }
-            }
+    fun updateLike(tweetId:String,uid: String, position: Int) {
+         
+    }
+
+    private fun postLike(likes: Long?, uid: String, position: Int, map: HashMap<String, Any>?) {
+        var like = likes?.plus(1)
+        if (like != null) {
+            map?.put("likes", like)
+        }
+        db.document("tweets").update("$uid", FieldValue.arrayUnion(map)).addOnSuccessListener {
+            toast("Success", context)
         }.addOnFailureListener {
-            toast("Failure", context)
+            toast("Failure $it", context)
         }
-
-    }
-    fun updateLike(uid:String,position:Int){
-        db.document("tweets").get().addOnSuccessListener {
-            val tweetArray=it.get("$uid") as ArrayList<HashMap<String,Any>>
-            val likes=tweetArray[position].get("likes") as Long
-            postLike(likes,uid,position)
-        }
-    }
-    private fun postLike(likes:Long,uid:String,position:Int){
 
     }
 }
