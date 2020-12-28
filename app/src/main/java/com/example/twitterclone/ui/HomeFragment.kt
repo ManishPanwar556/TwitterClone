@@ -1,5 +1,6 @@
 package com.example.twitterclone.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +18,8 @@ import com.example.twitterclone.R
 import com.example.twitterclone.adapters.MyAdapter
 import com.example.twitterclone.interfaces.ClickInterface
 import com.example.twitterclone.model.Tweet
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
@@ -69,7 +72,10 @@ class HomeFragment : Fragment(), ClickInterface {
     }
 
     override fun clickComment(tweetId: String, uid: String) {
-        CommentBottomSheet(uid, tweetId).show(requireActivity().supportFragmentManager, "tag")
+        val intent=Intent(context,CommentActivity::class.java)
+        intent.putExtra("tweetId",tweetId)
+        intent.putExtra("uid",uid)
+        startActivity(intent)
     }
 
 

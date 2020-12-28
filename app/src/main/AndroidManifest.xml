@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TwitterClone">
-        <activity android:name=".ui.UserProfileActivity"></activity>
+        <activity android:name=".ui.CommentActivity"></activity>
+        <activity android:name=".ui.UserProfileActivity" />
         <activity android:name=".ui.SearchResultsActivity" />
         <activity android:name=".ui.TweetPostActivity" />
         <activity android:name=".ui.SignInActivity">
