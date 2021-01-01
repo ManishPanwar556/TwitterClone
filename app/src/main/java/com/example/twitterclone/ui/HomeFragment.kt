@@ -1,6 +1,5 @@
 package com.example.twitterclone.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,9 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.twitterclone.Dao.TweetDao
@@ -18,16 +15,14 @@ import com.example.twitterclone.R
 import com.example.twitterclone.adapters.MyAdapter
 import com.example.twitterclone.interfaces.ClickInterface
 import com.example.twitterclone.model.Tweet
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
-import kotlinx.coroutines.GlobalScope
 
 class HomeFragment : Fragment(), ClickInterface {
-
+   lateinit var adapter:MyAdapter
     private val tweetDao by lazy {
         TweetDao(requireContext())
     }
@@ -45,30 +40,44 @@ class HomeFragment : Fragment(), ClickInterface {
             startActivity(intent)
         }
 
-        tweetDao.getTweets().whereEqualTo("uid", FirebaseAuth.getInstance().currentUser?.uid)
-            .addSnapshotListener { value, error ->
-                val list = value?.documents as ArrayList<DocumentSnapshot>
-                updateRecyclerView(list, view)
+//        tweetDao.getTweets().whereEqualTo("uid", FirebaseAuth.getInstance().currentUser?.uid)
+//            .addSnapshotListener { value, error ->
+//                val list = value?.documents as ArrayList<DocumentSnapshot>
+//                updateRecyclerView(list, view)
+//
+//            }
+        val rev = view.findViewById<RecyclerView>(R.id.tweetsRecyclerView)
+        val query=tweetDao.getTweets().orderBy("content")
+        val options=FirestoreRecyclerOptions.Builder<Tweet>().setQuery(query,Tweet::class.java).build()
+       adapter=MyAdapter(options,this)
+        query.get().addOnSuccessListener {
+            Log.e("Query","${it.documents}")
+        }
 
-            }
+        rev.adapter=adapter
+        rev.layoutManager=LinearLayoutManager(requireContext())
         return view
     }
 
-    private fun updateRecyclerView(list: ArrayList<DocumentSnapshot>, view: View) {
-        val rev = view.findViewById<RecyclerView>(R.id.tweetsRecyclerView)
-        rev.adapter = MyAdapter(list, this)
-        rev.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+//    private fun updateRecyclerView(list: ArrayList<DocumentSnapshot>, view: View) {
+//        val rev = view.findViewById<RecyclerView>(R.id.tweetsRecyclerView)
+//        rev.adapter = MyAdapter(list, this)
+//        rev.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+//    }
+
+    override fun onStart() {
+        super.onStart()
+        adapter.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        adapter.stopListening()
     }
 
     override fun clickLike(tweetId: String) {
-        tweetDao.getTweets().document(tweetId).get().addOnSuccessListener {
-            var likes = it.get("likes") as Long + 1
-            tweetDao.getTweets().document(tweetId).update("likes", likes).addOnSuccessListener {
-                Toast.makeText(context, "Like Success", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(context, "Like Failure", Toast.LENGTH_SHORT).show()
-            }
-        }
+        Log.e("TweetId",tweetId)
+        tweetDao.updateLike(tweetId)
     }
 
     override fun clickComment(tweetId: String, uid: String) {

@@ -17,6 +17,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class TweetDao(private val context: Context) {
+
     val tweetTag = "Tweet"
     private val db = FirebaseFirestore.getInstance().collection("users")
     private val tweetDb=FirebaseFirestore.getInstance().collection("tweets")
@@ -34,7 +35,9 @@ class TweetDao(private val context: Context) {
 
 
     }
-
+    fun getLikes(tweetId: String):DocumentReference{
+        return tweetDb.document(tweetId)
+    }
     private fun toast(message: String, toastContext: Context) {
         Toast.makeText(toastContext, message, Toast.LENGTH_SHORT).show()
     }
@@ -48,7 +51,7 @@ class TweetDao(private val context: Context) {
         val simpleDateFormat = SimpleDateFormat("MMM d")
         val date = Date(System.currentTimeMillis())
         val createdAt = simpleDateFormat.format(date)
-        val tweetEntity=Tweet(tweet,0,0,createdAt,profileUrl,uid,id,false)
+        val tweetEntity=Tweet(tweet,0,0,createdAt,profileUrl,uid!!,id,false)
 
        tweetDb.document("$id").set(tweetEntity).addOnSuccessListener {
            toast("Tweet Post Success",context)
@@ -57,20 +60,16 @@ class TweetDao(private val context: Context) {
        }
     }
 
-    fun updateLike(tweetId:String,uid: String, position: Int) {
+    fun updateLike(tweetId:String) {
+        tweetDb.document(tweetId).get().addOnSuccessListener {
+            val like=it.get("likes") as Long + 1
+            postLike(like,tweetId)
+        }
          
     }
-
-    private fun postLike(likes: Long?, uid: String, position: Int, map: HashMap<String, Any>?) {
-        var like = likes?.plus(1)
-        if (like != null) {
-            map?.put("likes", like)
-        }
-        db.document("tweets").update("$uid", FieldValue.arrayUnion(map)).addOnSuccessListener {
-            toast("Success", context)
-        }.addOnFailureListener {
-            toast("Failure $it", context)
-        }
-
+    private fun postLike(like:Long,tweetId: String){
+        tweetDb.document(tweetId).update("likes",like)
     }
+
+
 }

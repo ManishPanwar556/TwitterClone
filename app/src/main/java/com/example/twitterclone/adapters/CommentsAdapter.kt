@@ -8,33 +8,31 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.twitterclone.Dao.UserDao
 import com.example.twitterclone.R
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.twitterclone.model.Comment
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 
-class CommentsAdapter(var list: ArrayList<DocumentSnapshot>) :
-    RecyclerView.Adapter<CommentsAdapter.CommentsViewHolder>() {
+class CommentsAdapter(options: FirestoreRecyclerOptions<Comment>) :
+    FirestoreRecyclerAdapter<Comment,CommentsAdapter.CommentsViewHolder>(options) {
     private val userDao= UserDao()
-    inner class CommentsViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+    inner class CommentsViewHolder(val view: View) : RecyclerView.ViewHolder(view){
+        val commentProfile=view.findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.commentProfile)
+        val nameTextView=view.findViewById<TextView>(R.id.commentUserName)
+        val comment=view.findViewById<TextView>(R.id.commentTextView)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentsViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.comments_item, parent, false)
+        val view=LayoutInflater.from(parent.context).inflate(R.layout.comments_item,parent,false)
         return CommentsViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CommentsViewHolder, position: Int) {
-        val userImage = holder.view.findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.commentProfile)
-        val userName = holder.view.findViewById<TextView>(R.id.commentUserName)
-        val commentTextView = holder.view.findViewById<TextView>(R.id.commentTextView)
-        val id=list.get(position).get("createdBy").toString()
-        val comment=list.get(position).get("comment").toString()
-        userDao.getUser(id).get().addOnSuccessListener {
-            userName.text=it.get("name").toString()
-            Glide.with(holder.view).load(it.get("profileUrl").toString()).into(userImage)
-            commentTextView.text=comment
+    override fun onBindViewHolder(holder: CommentsViewHolder, position: Int, model: Comment) {
+        userDao.getUser(model.createdBy).get().addOnSuccessListener {
+            Glide.with(holder.view).load(it.get("profileUrl").toString()).into(holder.commentProfile)
+            holder.nameTextView.text=it.get("name").toString()
         }
+        holder.comment.text=model.comment
     }
 
-    override fun getItemCount() = list.size
 
 }

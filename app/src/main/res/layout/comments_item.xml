@@ -11,7 +11,7 @@
     android:layout_height="44dp"
     android:id="@+id/commentProfile"/>
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="4dp"
         android:layout_marginLeft="6dp"
@@ -26,10 +26,14 @@
                 android:layout_marginLeft="6dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
                 android:id="@+id/commentUserName"
                 android:textColor="@android:color/black"
-                android:textSize="15sp"/>
+                android:textSize="13sp"/>
             <TextView
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
                 android:layout_marginLeft="6dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

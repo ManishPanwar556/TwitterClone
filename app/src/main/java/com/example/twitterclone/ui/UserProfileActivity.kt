@@ -14,6 +14,8 @@ import com.example.twitterclone.Dao.UserDao
 import com.example.twitterclone.R
 import com.example.twitterclone.adapters.MyAdapter
 import com.example.twitterclone.interfaces.ClickInterface
+import com.example.twitterclone.model.Tweet
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -43,12 +45,11 @@ class UserProfileActivity : AppCompatActivity(),ClickInterface {
             val url=it.get("profileUrl").toString()
             Glide.with(this).load(url).into(profileImage)
         }
-        tweetDao.getTweets().whereEqualTo("uid",uid).addSnapshotListener { value, error ->
-            var list=value?.documents as ArrayList<DocumentSnapshot>
-            Log.e("list","$list")
-            rev.adapter=MyAdapter(list,this)
-            rev.layoutManager=LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        }
+        val query=tweetDao.getTweets().whereEqualTo("uid",uid)
+        val options= FirestoreRecyclerOptions.Builder<Tweet>().setQuery(query, Tweet::class.java).build()
+        val adapter=MyAdapter(options,this)
+        rev.adapter=adapter
+        rev.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
     }
 
     override fun clickLike(tweetId: String) {

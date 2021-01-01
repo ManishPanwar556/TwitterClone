@@ -14,11 +14,16 @@
     android:layout_gravity="top|left"
     android:id="@+id/killActivityBtn"/>
     <androidx.cardview.widget.CardView
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
         android:id="@+id/cardView"
         android:layout_width="match_parent"
+        app:cardCornerRadius="4dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:contentPadding="8dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
@@ -31,12 +36,15 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/tweetProfile"
                     android:layout_width="44dp"
                     android:layout_height="46dp" />
 
                 <TextView
+                    android:id="@+id/tweeUserNameTextView"
+                    android:textColor="@android:color/black"
+                    android:layout_marginLeft="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
@@ -49,7 +57,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="1dp"
                 android:layout_marginTop="6dp"
                 android:background="@android:color/black" />
 
