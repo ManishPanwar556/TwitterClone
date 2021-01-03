@@ -7,6 +7,5 @@ data class Tweet(
     var createdAt:String="",
     val profileUrl:String="",
     val uid:String="",
-    val tweetId:String="",
-    val checkLike:Boolean=false
+    val tweetId:String=""
 )

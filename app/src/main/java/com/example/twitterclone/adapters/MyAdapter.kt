@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.twitterclone.Dao.TweetDao
@@ -17,6 +18,7 @@ import com.example.twitterclone.model.Tweet
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MyAdapter(
     options: FirestoreRecyclerOptions<Tweet>,
@@ -30,7 +32,22 @@ class MyAdapter(
         val like = view.findViewById<TextView>(R.id.totalLikes)
         val thumbsUp = view.findViewById<ImageView>(R.id.thumbsUp)
         val name = view.findViewById<TextView>(R.id.tweetUserName)
-        val comment=view.findViewById<ImageView>(R.id.comments)
+        val comment = view.findViewById<ImageView>(R.id.comments)
+
+        init {
+
+
+            thumbsUp.setOnClickListener {
+                val tweetId = snapshots.get(adapterPosition).tweetId
+                clickInterface.clickLike(tweetId)
+            }
+            comment.setOnClickListener {
+                val tweetId = snapshots.get(adapterPosition).tweetId
+                val uid = snapshots.get(adapterPosition).uid
+                clickInterface.clickComment(tweetId, uid)
+            }
+        }
+
     }
 
     override fun onCreateViewHolder(
@@ -49,18 +66,36 @@ class MyAdapter(
         model: Tweet
     ) {
         holder.tweet.text = model.content
-        holder.like.text = model.likes.toString()
+
         UserDao().getUser(model.uid!!).get().addOnSuccessListener {
             holder.name.text = it.get("name").toString()
             Glide.with(holder.profile.context).load(it.get("profileUrl").toString())
                 .into(holder.profile)
         }
         val tweetId = model.tweetId
-        holder.thumbsUp.setOnClickListener {
-            clickInterface.clickLike(tweetId)
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        val did = FirebaseFirestore.getInstance().collection("tweets").document(tweetId)
+        did.collection("likes").orderBy("name").addSnapshotListener { value, error ->
+            holder.like.text = value?.documents?.size.toString()
         }
-        holder.comment.setOnClickListener {
-            clickInterface.clickComment(tweetId,model.uid)
+        did.collection("likes").document(uid.toString()).addSnapshotListener {value,error->
+            if (value?.exists()!!) {
+                holder.thumbsUp.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        holder.thumbsUp.context,
+                        R.drawable.ic_baseline_thumb_up_2
+                    )
+                )
+            } else {
+                holder.thumbsUp.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        holder.thumbsUp.context,
+                        R.drawable.ic_baseline_thumb_up_24
+                    )
+                )
+
+            }
         }
+
     }
 }

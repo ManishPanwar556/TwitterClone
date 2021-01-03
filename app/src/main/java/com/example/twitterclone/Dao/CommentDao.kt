@@ -12,6 +12,8 @@ import java.util.*
 class CommentDao {
     private var cuid = FirebaseAuth.getInstance().currentUser?.uid
     private val commentDb = FirebaseFirestore.getInstance().collection("comments")
+
+
     fun postComment(tweetId: String, userId: String, comment: String): Task<Void> {
         val id = UUID.randomUUID().toString()
         val createdAt = System.currentTimeMillis()

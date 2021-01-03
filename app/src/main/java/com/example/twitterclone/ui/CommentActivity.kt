@@ -44,8 +44,9 @@ class CommentActivity : AppCompatActivity() {
         adapter= CommentsAdapter(options)
         rev.adapter=adapter
         rev.layoutManager=LinearLayoutManager(this)
+
         thumbsUp.setOnClickListener {
-            tweetDao.updateLike(tweetId)
+            tweetDao.postLike(tweetId,uid)
         }
         tweetDao.getLikes(tweetId).addSnapshotListener { value, error ->
             totalLikes.text=value?.get("likes").toString()

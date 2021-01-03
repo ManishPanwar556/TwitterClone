@@ -16,28 +16,38 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class TweetDao(private val context: Context) {
-
-    val tweetTag = "Tweet"
+class TweetDao() {
     private val db = FirebaseFirestore.getInstance().collection("users")
-    private val tweetDb=FirebaseFirestore.getInstance().collection("tweets")
+    private val tweetDb = FirebaseFirestore.getInstance().collection("tweets")
     private val uid = FirebaseAuth.getInstance().currentUser?.uid
-    lateinit var result: Task<Void>
-    fun postTweet(tweet: String) {
 
+    lateinit var result: Task<Void>
+    lateinit var context: Context
+
+    constructor(context: Context) : this() {
+        this.context = context
+    }
+
+    fun postTweet(tweet: String) {
         db.document("$uid").get().addOnSuccessListener {
             val profileUrl = it.get("profileUrl").toString()
-            val totalFollowers=it.get("followers") as Long
-            val totalFollowing=it.get("following") as Long
-            val name=it.get("name").toString()
-            doPost(profileUrl,totalFollowers,totalFollowing,name,tweet)
+            val totalFollowers = it.get("followers") as Long
+            val totalFollowing = it.get("following") as Long
+            val name = it.get("name").toString()
+            doPost(profileUrl, totalFollowers, totalFollowing, name, tweet)
         }
 
 
     }
-    fun getLikes(tweetId: String):DocumentReference{
+
+    fun updateStatusOfLike(tweetId: String, status: Boolean): Task<Void> {
+        return tweetDb.document(tweetId).update("checkLike", status)
+    }
+
+    fun getLikes(tweetId: String): DocumentReference {
         return tweetDb.document(tweetId)
     }
+
     private fun toast(message: String, toastContext: Context) {
         Toast.makeText(toastContext, message, Toast.LENGTH_SHORT).show()
     }
@@ -46,30 +56,56 @@ class TweetDao(private val context: Context) {
         return tweetDb
     }
 
-    private fun doPost(profileUrl:String,totalFollowers:Long,totalFollowing:Long,name:String,tweet: String) {
-        val id=UUID.randomUUID().toString()
+    private fun doPost(
+        profileUrl: String,
+        totalFollowers: Long,
+        totalFollowing: Long,
+        name: String,
+        tweet: String
+    ) {
+        val id = UUID.randomUUID().toString()
         val simpleDateFormat = SimpleDateFormat("MMM d")
         val date = Date(System.currentTimeMillis())
         val createdAt = simpleDateFormat.format(date)
-        val tweetEntity=Tweet(tweet,0,0,createdAt,profileUrl,uid!!,id,false)
+        val tweetEntity = Tweet(tweet, 0, 0, createdAt, profileUrl, uid!!, id)
 
-       tweetDb.document("$id").set(tweetEntity).addOnSuccessListener {
-           toast("Tweet Post Success",context)
-       }.addOnFailureListener {
-           toast("Tweet Post Failure",context)
-       }
-    }
-
-    fun updateLike(tweetId:String) {
-        tweetDb.document(tweetId).get().addOnSuccessListener {
-            val like=it.get("likes") as Long + 1
-            postLike(like,tweetId)
+        tweetDb.document("$id").set(tweetEntity).addOnSuccessListener {
+            toast("Tweet Post Success", context)
+        }.addOnFailureListener {
+            toast("Tweet Post Failure", context)
         }
-         
     }
-    private fun postLike(like:Long,tweetId: String){
-        tweetDb.document(tweetId).update("likes",like)
+
+    fun postLike(tweetId: String,uid:String) {
+        db.document(uid).get().addOnSuccessListener {
+            val profileUrl=it.get("profileUrl").toString()
+            val name=it.get("name").toString()
+            postLikeDocument(profileUrl,name,tweetId,uid)
+        }
+
+
     }
+    private fun postLikeDocument(profileUrl: String,name: String,tweetId: String,uid: String){
+        val map= hashMapOf<String,Any>(
+            "name" to name,
+            "profileUrl" to profileUrl
+        )
+        tweetDb.document(tweetId).collection("likes").document(uid).set(map).addOnSuccessListener {
+            Log.e("Like","Success")
+        }.addOnFailureListener {
+            Log.e("Like","Failure")
+        }
+    }
+    fun removeLike(tweetId: String,uid:String){
+        tweetDb.document(tweetId).collection("likes").document(uid).delete().addOnSuccessListener {
+            Log.e("Like","Removed Like")
+        }.addOnFailureListener {
+            Log.e("Like","Failure")
+        }
+
+    }
+
+
 
 
 }

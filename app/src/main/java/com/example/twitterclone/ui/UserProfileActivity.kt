@@ -1,5 +1,6 @@
 package com.example.twitterclone.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -16,12 +17,14 @@ import com.example.twitterclone.adapters.MyAdapter
 import com.example.twitterclone.interfaces.ClickInterface
 import com.example.twitterclone.model.Tweet
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UserProfileActivity : AppCompatActivity(),ClickInterface {
     private val db=FirebaseFirestore.getInstance()
-
+    lateinit var adapter: MyAdapter
+    private val tweetDao=TweetDao(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
@@ -47,16 +50,30 @@ class UserProfileActivity : AppCompatActivity(),ClickInterface {
         }
         val query=tweetDao.getTweets().whereEqualTo("uid",uid)
         val options= FirestoreRecyclerOptions.Builder<Tweet>().setQuery(query, Tweet::class.java).build()
-        val adapter=MyAdapter(options,this)
+        adapter=MyAdapter(options,this)
         rev.adapter=adapter
         rev.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
     }
 
     override fun clickLike(tweetId: String) {
-        Toast.makeText(this,"Like Click",Toast.LENGTH_SHORT).show()
+        val uid=FirebaseAuth.getInstance().currentUser?.uid
+       tweetDao.postLike(tweetId,uid.toString())
     }
 
     override fun clickComment(tweetId: String,uid:String) {
-        Toast.makeText(this,"Dislike Click",Toast.LENGTH_SHORT).show()
+        val intent= Intent(this,CommentActivity::class.java)
+        intent.putExtra("uid",uid)
+        intent.putExtra("tweetId",tweetId)
+        startActivity(intent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        adapter.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        adapter.stopListening()
     }
 }

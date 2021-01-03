@@ -20,6 +20,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeFragment : Fragment(), ClickInterface {
    lateinit var adapter:MyAdapter
@@ -77,7 +78,15 @@ class HomeFragment : Fragment(), ClickInterface {
 
     override fun clickLike(tweetId: String) {
         Log.e("TweetId",tweetId)
-        tweetDao.updateLike(tweetId)
+        val uid=FirebaseAuth.getInstance().currentUser?.uid
+        FirebaseFirestore.getInstance().collection("tweets").document(tweetId).collection("likes").document(uid.toString()).get().addOnSuccessListener {
+            if(it.exists()){
+                tweetDao.removeLike(tweetId,uid.toString())
+            }
+            else{
+                tweetDao.postLike(tweetId,uid.toString())
+            }
+        }
     }
 
     override fun clickComment(tweetId: String, uid: String) {
