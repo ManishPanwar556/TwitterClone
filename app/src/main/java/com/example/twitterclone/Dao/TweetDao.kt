@@ -44,8 +44,8 @@ class TweetDao() {
         return tweetDb.document(tweetId).update("checkLike", status)
     }
 
-    fun getLikes(tweetId: String): DocumentReference {
-        return tweetDb.document(tweetId)
+    fun getLikes(tweetId: String): CollectionReference {
+        return tweetDb.document(tweetId).collection("likes")
     }
 
     private fun toast(message: String, toastContext: Context) {
